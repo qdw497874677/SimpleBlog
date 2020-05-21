@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Test</h1>
+<a>@{test}</a>
+<input type="hidden" id="adata" value="<%=request.getParameter("adata")%>"/>
+
+</body>
+<script>
+    var bdata = $("#adata").val();
+    console.log(bdata);//输出为"12"
+</script>
+</html>

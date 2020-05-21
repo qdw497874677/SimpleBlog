@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qdw.mapper.UserMapper">
+
+    <select id="queryUserList" resultType="UserVo">
+        select * from user;
+    </select>
+    
+    <select id="queryUserById" resultType="UserVo" parameterType="int">
+        select * from user where id = #{id}
+    </select>
+    
+    <insert id="addUser" parameterType="UserVo">
+        insert into user (id,name,pwd) values (#{id},#{username},#{password});
+    </insert>
+    
+    <update id="updateUser" parameterType="UserVo">
+        update user set name=#{username},pwd=#{password} = id where #{id};
+    </update>
+
+    <delete id="deleteUser" parameterType="UserVo">
+        delete from user where id=#{id}
+    </delete>
+
+    <select id="selectUserAuthorities" resultType="Role">
+        SELECT * FROM role
+        WHERE id IN (
+          SELECT roleid FROM user_role WHERE userid = #{id}
+        )
+
+    </select>
+
+    <select id="selectUserByUsername" resultType="UserVo" parameterType="string">
+        select * from user where username=#{username}
+    </select>
+
+    <select id="selectRoleById" resultType="Role">
+        select * from role where id=#{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qdw.mapper.BlogMapper">
+
+    <select id="qureyBlogList" resultMap="blogtype">
+        select b.id bi,b.authorname ba,b.title bt,b.content bc,b.firstpicture bfp,b.summary bs,b.typeid bti,b.flag bf,b.recommend br,b.published bp,t.name tn,b.create_time bcr,b.update_time bu,b.views bv
+        from blog b left join type t on t.id=b.typeid
+        <if test="ids!=null">
+
+            <foreach  collection="ids" index="index" item="item" open="and b.id in (" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query!=null">
+            and ( b.summary like "%"#{query}"%" or b.title like "%"#{query}"%" )
+        </if>
+        <if test="typeId!=null">
+            and b.typeid = #{typeId}
+        </if>
+
+        <if test="tagId!=null">
+            and b.id in (select blogid from blog_tag blta where tagid = #{tagId})
+        </if>
+        <if test="title != null ">
+            and b.title like "%"#{title}"%"
+        </if>
+        <if test="recommend != null">
+            and b.recommend=#{recommend}
+        </if>
+        <if test="summary != null">
+            or b.summary like "%"#{summary}"%"
+        </if>
+        <if test="order!=null">
+            order by b.create_time desc
+        </if>
+    </select>
+    <resultMap id="blogtype" type="Blog">
+        <result property="id" column="bi"/>
+        <result property="authorName" column="ba"/>
+        <result property="title" column="bt"/>
+        <result property="content" column="bc"/>
+        <result property="firstPicture" column="bfp"/>
+        <result property="summary" column="bs"/>
+        <result property="flag" column="bf"/>
+        <result property="recommend" column="br"/>
+        <result property="published" column="bp"/>
+        <result property="createTime" column="bcr"/>
+        <result property="updateTime" column="bu"/>
+        <result property="views" column="bv"/>
+        <association property="type" javaType="Type">
+            <result property="name" column="tn"/>
+        </association>
+        <collection property="tags" javaType="ArrayList" ofType="Tag" column="bi" select="com.qdw.mapper.TagMapper.qureyTagListByBlogId"></collection>
+    </resultMap>
+
+
+    <select id="qureyBlogById" resultMap="BlogType">
+        select b.id bi,b.title bt,b.content bc,b.authorname bau,b.firstpicture bfp,b.summary bs,b.typeid bti,b.flag bf,b.recommend br,b.published bp,b.tag_ids btids,b.appreciation ba,b.commentabled bco,b.share_statement bsh,b.update_time bup
+        from blog b where b.id=#{id}
+    </select>
+    <resultMap id="BlogType" type="Blog">
+        <result property="id" column="bi"/>
+        <result property="title" column="bt"/>
+        <result property="content" column="bc"/>
+        <result property="authorName" column="bau"/>
+        <result property="firstPicture" column="bfp"/>
+        <result property="summary" column="bs"/>
+        <result property="flag" column="bf"/>
+        <result property="recommend" column="br"/>
+        <result property="published" column="bp"/>
+        <result property="tagIds" column="btids"/>
+        <result property="appreciation" column="ba"/>
+        <result property="commentabled" column="bco"/>
+        <result property="shareStatement" column="bsh"/>
+        <result property="updateTime" column="bup"/>
+        <association property="type" javaType="Type">
+            <result property="id" column="bti"/>
+        </association>
+    </resultMap>
+
+<!--     select b.id bi,b.title bt,t.name tn,b.flag bf,b.recommend br,b.published bp,b.update_time bu,b.tag_ids btids
+        from blog b,type t
+        where b.typeid=t.id-->
+    <select id="qureyBlogListSimple" resultMap="BlogSimple">
+        select b.id bi,b.title bt,t.name tn,b.flag bf,b.recommend br,b.published bp,b.update_time bu,b.tag_ids btids
+        from blog b,type t
+        where b.typeid=t.id
+    </select>
+    <resultMap id="BlogSimple" type="Blog">
+        <result property="id" column="bi"/>
+        <result property="title" column="bt"/>
+        <result property="flag" column="bf"/>
+        <result property="recommend" column="br"/>
+        <result property="published" column="bp"/>
+        <result property="updateTime" column="bu"/>
+        <result property="tagIds" column="btids"/>
+        <association property="type" javaType="Type">
+            <result property="name" column="tn"/>
+        </association>
+
+    </resultMap>
+
+    <select id="countBlog" resultType="integer">
+        select count(*) from blog
+    </select>
+
+<!--    <select id="qureyBlogPage" resultMap="BlogSimple" parameterType="map">-->
+<!--        select b.id bi,b.title bt,t.name tn,b.flag bf,b.recommend br,b.published bp,b.update_time bu-->
+<!--        from blog b,type t-->
+<!--        where b.typeid=t.id-->
+<!--        limit #{page},#{size}-->
+<!--    </select>-->
+
+    <update id="updataBlog" parameterType="Blog">
+        update blog set typeid=#{type.id},title=#{title},content=#{content},firstpicture=#{firstPicture} where id=#{id}
+    </update>
+
+    <select id="qureyBlogByTitle" parameterType="string" resultType="Blog">
+        select * from blog where title=#{title}
+    </select>
+
+    <insert id="insertBlog" parameterType="Blog" useGeneratedKeys = "true" keyProperty="id">
+        insert into blog
+        (authorname,title,summary,content,firstpicture,views,flag,appreciation,commentabled,recommend,published,share_statement,create_time,update_time,userid,typeid,tag_ids)
+        values (#{authorName},#{title},#{summary},#{content}
+        ,#{firstPicture},#{views},#{flag},#{appreciation},#{commentabled},#{recommend},#{published},#{shareStatement}
+        ,#{createTime},#{updateTime},#{userVo.id},#{type.id},#{tagIds})
+    </insert>
+
+
+
+
+
+    <select id="qureyBlogIf" resultType="map" resultMap="BlogSimple">
+        select b.id bi,b.title bt,t.name tn,b.flag bf,b.recommend br,b.published bp,b.update_time bu
+        from blog b,type t where b.typeid=t.id
+        <if test="title != null ">
+            and b.title like "%"#{title}"%"
+        </if>
+        <if test="typeId != null">
+            and b.typeid = #{typeId}
+        </if>
+        <if test="recommend != null">
+            and b.recommend=#{recommend}
+        </if>
+        <if test="summary != null">
+            or b.summary like "%"#{summary}"%"
+        </if>
+        order by b.update_time desc
+
+    </select>
+
+    <delete id="deleteBlog" >
+        delete from blog where id = #{id}
+    </delete>
+
+    <select id="queryBlogByTypeId" resultType="Blog">
+        select * from blog where typeid=#{typeId}
+    </select>
+
+
+</mapper>

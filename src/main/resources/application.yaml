@@ -1,0 +1,50 @@
+#配置项目路径
+#server:
+#  servlet:
+#    context-path: "/qdw"
+spring:
+  messages:
+    basename: "i18n.login"
+  mvc:
+    locale: "en_US"
+    date-format: yyyy-MM-dd
+    static-path-pattern: /static/**
+  datasource:
+    username: root
+    password: 123321
+    url: jdbc:mysql://localhost:3306/emptest?serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  resources:
+    static-locations: classpath:/static/
+  thymeleaf:
+    cache: false
+  redis:
+    database: 1
+    host: 127.0.0.1
+    port: 6379
+
+
+
+mybatis:
+  type-aliases-package: com.qdw.pojo
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  level:
+    com:
+      qdw:
+        mapper: debug
+
+
+comment.avatar: /images/avatar.png
+
+

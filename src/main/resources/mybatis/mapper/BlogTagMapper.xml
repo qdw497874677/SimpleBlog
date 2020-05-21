@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qdw.mapper.BlogTagMapper">
+
+    <insert id="insertBlogTag">
+        insert into blog_tag (blogid,tagid) values (#{blogId},#{tagId})
+    </insert>
+
+    <insert id="insertBlogTags" parameterType="list">
+        insert into blog_tag (blogid,tagid) values
+        <foreach collection="list" index="index" separator="," item="item">
+            (#{item.blogId},#{item.tagId})
+        </foreach>
+        on duplicate key update tagid= values(tagid)
+    </insert>
+
+    <select id="hasBLogTag" resultType="integer">
+        select count(1) from blog_tag where blogid=#{param1} and tagid=#{param2}
+    </select>
+
+    <delete id="deleteBlogTagByBlogId" >
+        delete from blog_tag where blogid=#{blogId}
+    </delete>
+
+    <delete id="deleteBlogTagByTagId" >
+        delete from blog_tag where tagid=#{tagId}
+    </delete>
+
+    <select id="qureyTagsByBlogId" resultMap="TagId">
+        select bt.tagid btt,t.name tn from blog_tag bt,tag t where bt.blogid=#{blogId} and t.id = bt.tagid
+    </select>
+    <resultMap id="TagId" type="Tag">
+        <result property="id" column="btt"/>
+        <result property="name" column="tn"/>
+    </resultMap>
+
+    <select id="qureyBlogsByTagId" resultType="integer">
+        select blogid from blog_tag where tagid=#{tagId}
+    </select>
+
+    <select id="countByBlogId" resultType="integer">
+        select count(1) from blog_tag where blogid=#{blogId};
+    </select>
+
+</mapper>
